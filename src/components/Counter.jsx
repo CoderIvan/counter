@@ -6,12 +6,7 @@ function Counter({
 }) {
   return (
     <p>
-      Clicked:
-      {' '}
-      {value}
-      {' '}
-      times
-      {' '}
+      {`Clicked: ${value} times `}
       <button type="button" onClick={onIncrement}>
         +
       </button>
