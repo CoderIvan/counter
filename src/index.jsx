@@ -1,29 +1,26 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { createStore, applyMiddleware } from 'redux';
-import createSagaMiddleware from 'redux-saga';
+import dva, { connect } from 'dva';
+
 import Counter from './components/Counter';
 
-import counter from './reducers';
-import mySaga from './sagas';
+import countModel from './models';
 
-const sagaMiddleware = createSagaMiddleware();
-const store = createStore(counter, applyMiddleware(sagaMiddleware));
+const App = connect(({ count }) => ({
+  count,
+}))(({ dispatch, count }) => (
+  <Counter
+    value={count}
+    onIncrement={() => { dispatch({ type: 'count/increment' }); }}
+    onDecrement={() => { dispatch({ type: 'count/decrement' }); }}
+    onIncrementIfOdd={() => { dispatch({ type: 'count/incrementIfOdd' }); }}
+    onIncrementAsync={() => { dispatch({ type: 'count/incrementAsync' }); }}
+  />
+));
 
-sagaMiddleware.run(mySaga);
+const app = dva();
 
-const render = () => {
-  ReactDOM.render(
-    <Counter
-      value={store.getState()}
-      onIncrement={() => { store.dispatch({ type: 'INCREMENT' }); }}
-      onDecrement={() => { store.dispatch({ type: 'DECREMENT' }); }}
-      onIncrementIfOdd={() => { store.dispatch({ type: 'INCREMENT_IF_ODD' }); }}
-      onIncrementAsync={() => { store.dispatch({ type: 'INCREMENT_ASYNC' }); }}
-    />,
-    document.getElementById('root'), // eslint-disable-line no-undef
-  );
-};
+app.model(countModel);
 
-render();
-store.subscribe(render);
+app.router(() => <App />);
+
+app.start('#root');
